@@ -1,15 +1,42 @@
 <template>
-  <base-layout></base-layout>
+  <base-layout>
+    <product-listing>
+    </product-listing>
+  </base-layout>
 </template>
 
 <script lang="ts">
 // import { } from '@ionic/vue';
 import { defineComponent } from 'vue';
+import store from '@/store';
+import ProductListing from '@/components/product/ProductListingController.vue';
 
 export default defineComponent({
   name: 'HomePage',
   components: {
-
+    ProductListing
+  },
+  data() {
+    return {
+      products: []
+    }
+  },
+  mounted() {
+    // console.log(store.dispatch('addProduct', { 'name': "laptop", "category": "laptop", "description": "description", "user_id": "1", "product_image": 'hello' }));
+    // this.getAllProduct()
+    //   .then((data) => console.log('data:', data))
+    //   .catch((err) => console.log(err))
+  },
+  methods: {
+    async getAllProduct() {
+      try {
+        const response = await store.dispatch('getProducts');
+        console.log('response', response);
+        return response;
+      } catch (err) {
+        console.log(err);
+      }
+    }
   }
 });
 </script>

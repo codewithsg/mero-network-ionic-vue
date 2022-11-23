@@ -28,7 +28,7 @@
                             <div class="dropdown-menu-text">Home</div>
                         </a>
                     </ion-item>
-                    <ion-item class="dropdown-menu-item">
+                    <ion-item class="dropdown-menu-item" v-if="getLoginStatus">
                         <a class="dropdown-menu-link" href="/products/add">
                             <div class="dropdown-menu-text">Add Product</div>
                         </a>

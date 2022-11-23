@@ -26,32 +26,18 @@
                             <ion-textarea :auto-grow="true" v-model="formData.description" required
                                 placeholder="Enter description" />
                         </ion-item>
-                        <!-- <ion-item>
-                            <ion-label>Upload Product Image</ion-label>
-                            <input type="file" id="file" />
-                        </ion-item> -->
                     </ion-list>
 
-                    <!-- <ion-fab>
-                        <ion-fab-button @click="takePhoto()">
+                    <ion-fab>
+                        <ion-fab-button @click="getPhoto()">
                             <ion-icon :icon="camera"></ion-icon>
                         </ion-fab-button>
-                    </ion-fab> -->
+                    </ion-fab>
 
                     <ion-button class="add-button" type=" submit">Add</ion-button>
                 </form>
-                <!-- <ion-fab>
-                    <ion-fab-button @click="takePhoto()">
-                        <ion-icon :icon="camera"></ion-icon>
-                    </ion-fab-button>
-                </ion-fab> -->
             </ion-card-content>
         </ion-card>
-        <ion-fab vertical="bottom" horizontal="center" slot="fixed">
-            <ion-fab-button @click="takePhoto()">
-                <ion-icon :icon="camera"></ion-icon>
-            </ion-fab-button>
-        </ion-fab>
     </base-layout>
 </template>
 
@@ -76,6 +62,10 @@ import { defineComponent } from 'vue';
 import { mapGetters } from 'vuex';
 import { camera } from 'ionicons/icons';
 import { usePhotoGallery } from '@/utils/uploadPhoto';
+import store from '@/store/index';
+import router from '@/router';
+
+const { takePhoto } = usePhotoGallery();
 
 export default defineComponent({
     components: {
@@ -95,32 +85,49 @@ export default defineComponent({
         IonIcon
     },
     setup() {
-        const { takePhoto } = usePhotoGallery();
         return {
-            takePhoto,
             camera
         }
     },
     data() {
+
         return {
             formData: {
                 "name": "",
                 "category": "",
                 "description": "",
+                "product_image": "",
+                "user_id": ""
             }
         }
     },
     methods: {
         async addProduct() {
             try {
+                if (store.state.user_id) {
+                    this.formData.user_id = store.state.user_id
+                }
+                // console.log(store.state.user_id);
+                this.formData.product_image = 'https://consumer.huawei.com/content/dam/huawei-cbg-site/southeast-asia/bd/mkt/plp/laptops/matebook-d-15.jpg';
                 console.log('submitting...', this.formData)
+                const response = await store.dispatch('addProduct', this.formData);
+                router.push('/products');
             } catch (err: any) {
                 console.log('err:', err);
+            }
+        },
+        async getPhoto() {
+            try {
+                const photoInfo = await takePhoto();
+                console.log('photo:', photoInfo);
+                this.formData.product_image = photoInfo.filePath
+            } catch (err) {
+                console.log('err', err);
             }
         }
     },
     computed: {
-        ...mapGetters(['getLoginStatus'])
+        ...mapGetters(['getUserId'])
     }
 })
 </script>

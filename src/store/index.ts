@@ -2,16 +2,21 @@ import { createStore } from 'vuex';
 import instance from '@/utils/axios';
 import users from './users';
 import { ILoginUSer, IRegisterUser } from '@/interfaces/User.Interface';
+import product from './products';
 
 export default createStore({
   state: {
     access_token: sessionStorage.getItem("access_token"),
     login_status: sessionStorage.getItem('login_status'),
-    user_name: sessionStorage.getItem("user_name")
+    user_name: sessionStorage.getItem("user_name"),
+    user_id: sessionStorage.getItem("user_id")
   },
   getters: {
     getLoginStatus(state) {
       return state.login_status;
+    },
+    getUserId(state) {
+      return state.user_id;
     }
   },
   mutations: {
@@ -26,6 +31,10 @@ export default createStore({
       sessionStorage.setItem("login_status", 'true');
 
     },
+    SET_USER_ID(state, data) {
+      state.user_id = data;
+      sessionStorage.setItem('user_id', data);
+    },
     LOGOUT: (state) => {
       sessionStorage.removeItem("access_token");
       state.access_token = null;
@@ -33,6 +42,8 @@ export default createStore({
       state.login_status = null;
       sessionStorage.removeItem('user_name');
       state.user_name = null;
+      sessionStorage.removeItem('user_id');
+      state.user_id = null;
     }
   },
   actions: {
@@ -48,6 +59,9 @@ export default createStore({
         if (res.data.user.firstName) {
           context.commit('SET_USER_NAME', res.data.user.firstName);
         }
+        if (res.data.user.id) {
+          context.commit('SET_USER_ID', res.data.user.id);
+        }
         return res;
       } catch (err: any) {
         return err;
@@ -57,11 +71,14 @@ export default createStore({
       try {
         const res = await instance.post('auth/login', data);
         if (res.data.user != undefined) {
-          if (res.data.token != undefined) {
+          if (res.data.token) {
             context.commit('SET_TOKEN', res.data.token);
           }
-          if (res.data.user.firstName != undefined) {
+          if (res.data.user.firstName) {
             context.commit('SET_USER_NAME', res.data.user.firstName);
+          }
+          if (res.data.user.id) {
+            context.commit('SET_USER_ID', res.data.user.id);
           }
         }
         return res;
@@ -73,7 +90,7 @@ export default createStore({
       commit('LOGOUT');
     }
   },
-  modules: {
-    users: users
+  modules: <any>{
+    products: product
   }
 })

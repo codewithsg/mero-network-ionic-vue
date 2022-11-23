@@ -40,6 +40,8 @@ export function usePhotoGallery() {
         //     webViewPath: photo.webPath
         // };
         photos.value = [savedFileImage, ...photos.value];
+        // console.log('saved:', savedFileImage);
+        return savedFileImage;
     };
 
     const convertBlobToBase64 = (blob: Blob) =>
@@ -61,6 +63,7 @@ export function usePhotoGallery() {
                 path: photo.path!,
             });
             base64Data = file.data;
+
         } else {
             //fetch the photo, read as blob, then convert to base64 format
             const response = await fetch(photo.webPath!);

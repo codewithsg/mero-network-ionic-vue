@@ -56,7 +56,6 @@ import {
     IonInput,
     IonButton
 } from '@ionic/vue';
-import { gitCommit } from 'ionicons/icons';
 import { defineComponent } from 'vue';
 import { IRegisterUser } from './../../interfaces/User.Interface';
 
