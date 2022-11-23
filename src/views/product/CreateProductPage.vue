@@ -36,6 +36,7 @@
 
                     <ion-button class="add-button" type=" submit">Add</ion-button>
                 </form>
+                <p>this is product image {{ formData.product_image }}</p>
             </ion-card-content>
         </ion-card>
     </base-layout>
@@ -108,7 +109,9 @@ export default defineComponent({
                     this.formData.user_id = store.state.user_id
                 }
                 // console.log(store.state.user_id);
-                this.formData.product_image = 'https://consumer.huawei.com/content/dam/huawei-cbg-site/southeast-asia/bd/mkt/plp/laptops/matebook-d-15.jpg';
+                if (this.formData.product_image == '') {
+                    this.formData.product_image = 'https://consumer.huawei.com/content/dam/huawei-cbg-site/southeast-asia/bd/mkt/plp/laptops/matebook-d-15.jpg';
+                }
                 console.log('submitting...', this.formData)
                 const response = await store.dispatch('addProduct', this.formData);
                 router.push('/products');
@@ -121,6 +124,7 @@ export default defineComponent({
                 const photoInfo = await takePhoto();
                 console.log('photo:', photoInfo);
                 this.formData.product_image = photoInfo.filePath
+
             } catch (err) {
                 console.log('err', err);
             }

@@ -16,7 +16,7 @@ export default {
             try {
                 const res = await instance.post('products/add', data);
                 // console.log('res:', res);
-                const res1 = await instance.get('products/getall');
+                const res1 = await instance.get('products');
                 // console.log('resq:', res1);
                 return res.data;
             } catch (err: any) {
@@ -25,7 +25,7 @@ export default {
         },
         getProducts: async (context: any) => {
             try {
-                const res = await instance.get('products/getall');
+                const res = await instance.get('products');
                 // console.log('res:', res);
                 return res;
             } catch (err: any) {

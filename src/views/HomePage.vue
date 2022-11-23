@@ -1,7 +1,14 @@
 <template>
   <base-layout>
-    <product-listing>
-    </product-listing>
+    <ion-card v-for="product in products" :key="product.id" :router-link="`/products/${product.id}`">
+      <img :src="product.product_image" alt="{{product.name}}" />
+      <ion-card-header>
+        <ion-card-title>{{ product.name }}</ion-card-title>
+        <ion-card-subtitle>{{ product.category }}</ion-card-subtitle>
+      </ion-card-header>
+      <!-- {{ product.product_image }} -->
+      <ion-card-content>{{ product.description }}</ion-card-content>
+    </ion-card>
   </base-layout>
 </template>
 
@@ -9,23 +16,35 @@
 // import { } from '@ionic/vue';
 import { defineComponent } from 'vue';
 import store from '@/store';
-import ProductListing from '@/components/product/ProductListingController.vue';
+import {
+  IonCard,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardSubtitle,
+  IonCardContent
+} from '@ionic/vue';
 
 export default defineComponent({
   name: 'HomePage',
   components: {
-    ProductListing
+    IonCard,
+    IonCardHeader,
+    IonCardTitle,
+    IonCardSubtitle,
+    IonCardContent
   },
   data() {
     return {
-      products: []
+      products: [{}] as any,
     }
   },
   mounted() {
-    // console.log(store.dispatch('addProduct', { 'name': "laptop", "category": "laptop", "description": "description", "user_id": "1", "product_image": 'hello' }));
-    // this.getAllProduct()
-    //   .then((data) => console.log('data:', data))
-    //   .catch((err) => console.log(err))
+    store.dispatch('getProducts')
+      .then(data => {
+        this.products = data.data
+        console.log('data:', data);
+      })
+      .catch(err => console.log(err))
   },
   methods: {
     async getAllProduct() {
