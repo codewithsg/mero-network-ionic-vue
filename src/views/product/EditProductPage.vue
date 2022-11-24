@@ -2,10 +2,10 @@
     <base-layout>
         <ion-card>
             <ion-card-header>
-                <ion-card-title>Add new product</ion-card-title>
+                <ion-card-title>Edit Product</ion-card-title>
             </ion-card-header>
             <ion-card-content>
-                <form @submit.prevent="addProduct()">
+                <form @submit.prevent="editProduct()">
                     <ion-list>
                         <ion-item>
                             <ion-label position="floating">Product Name</ion-label>
@@ -21,28 +21,30 @@
                                 <ion-select-option value="monitor">Monitor</ion-select-option>
                             </ion-select>
                         </ion-item>
-                        <ion-item :counter="true">
+                        <ion-item>
                             <ion-label position="floating">Product Description</ion-label>
-                            <ion-textarea :maxlength="500" :auto-grow="true" v-model="formData.description" required
+                            <ion-textarea :auto-grow="true" v-model="formData.description" required
                                 placeholder="Enter description" />
                         </ion-item>
                     </ion-list>
+                    <img v-if="formData.product_image" :src="formData.product_image" alt="image" />
 
+
+
+                    <ion-button class="add-button" type=" submit">Edit</ion-button>
                     <ion-fab>
-                        <ion-fab-button @click="getPhoto()">
+                        <ion-fab-button class="camera-icon" @click="getPhoto()">
                             <ion-icon :icon="camera"></ion-icon>
                         </ion-fab-button>
                     </ion-fab>
-
-                    <ion-button class="add-button" type=" submit">Add</ion-button>
                 </form>
-                <img :src="formData.product_image" v-if="formData.product_image" />
             </ion-card-content>
         </ion-card>
     </base-layout>
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue';
 import {
     IonCard,
     IonCardHeader,
@@ -59,14 +61,14 @@ import {
     IonFabButton,
     IonIcon
 } from '@ionic/vue';
-import { defineComponent } from 'vue';
-import { mapGetters } from 'vuex';
 import { camera } from 'ionicons/icons';
 import { usePhotoGallery } from '@/utils/uploadPhoto';
-import store from '@/store/index';
+import store from '@/store';
 import router from '@/router';
 
 const { takePhoto } = usePhotoGallery();
+
+// location.reload();
 
 export default defineComponent({
     components: {
@@ -87,39 +89,29 @@ export default defineComponent({
     },
     setup() {
         return {
+
             camera
         }
     },
     data() {
-
         return {
+            productId: this.$route.params.id,
             formData: {
                 "name": "",
                 "category": "",
                 "description": "",
                 "product_image": "",
                 "user_id": ""
-            }
+            },
+
         }
     },
+    mounted() {
+        store.dispatch('getProductById', this.productId)
+            .then(data => this.formData = data.data[0])
+            .catch(err => console.log('err in by id:', err))
+    },
     methods: {
-        async addProduct() {
-            try {
-                if (store.state.user_id) {
-                    this.formData.user_id = store.state.user_id
-                }
-                // console.log(store.state.user_id);
-                if (this.formData.product_image == '') {
-                    this.formData.product_image = 'https://consumer.huawei.com/content/dam/huawei-cbg-site/southeast-asia/bd/mkt/plp/laptops/matebook-d-15.jpg';
-                }
-                console.log('submitting...', this.formData)
-                const response = await store.dispatch('addProduct', this.formData);
-                store.commit('SET_REFRESH_PAGE', true);
-                router.push('/home');
-            } catch (err: any) {
-                console.log('err:', err);
-            }
-        },
         async getPhoto() {
             try {
                 const photoInfo = await takePhoto();
@@ -129,18 +121,29 @@ export default defineComponent({
             } catch (err) {
                 console.log('err', err);
             }
+        },
+        async editProduct() {
+            try {
+                const response = await store.dispatch('editProduct', this.formData);
+                // this.$router.push(`/products/${this.productId}`);
+                store.commit('SET_REFRESH_PAGE', true)
+                this.$router.replace('/home');
+                // this.$router.push({ path: '/home', replace: true });
+                // this.$router.go('/home')
+            } catch (err) {
+                console.log(err);
+            }
         }
-    },
-    computed: {
-        ...mapGetters(['getUserId'])
     }
 })
 </script>
 
-<style scoped>
+<style focused>
 .camera-icon {
-    margin-top: 10px;
+    margin-top: 20px;
     margin-bottom: 10px;
+    align-items: center;
+    justify-items: center;
 }
 
 .add-button {

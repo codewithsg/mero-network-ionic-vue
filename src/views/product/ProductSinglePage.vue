@@ -14,12 +14,16 @@
                 </ion-fab-button>
             </ion-fab> -->
             <div class="button-css" v-if="product.user_id == getUserId">
-                <ion-button class="ion-button-css">
-                    <ion-icon class="ion-icon-edit" slot="icon-only" :icon="createOutline"></ion-icon>
-                </ion-button>
-                <ion-button class="ion-button-css">
-                    <ion-icon class="ion-icon-delete" slot="icon-only" :icon="trash"></ion-icon>
-                </ion-button>
+                <div v-if="iconLoad">
+                    <ion-button @click="editProduct()" class="ion-button-css">
+                        <ion-icon class="ion-icon-edit" slot="icon-only" :icon="createOutline"></ion-icon>
+                    </ion-button>
+                    <ion-button class="ion-button-css" @click="deleteProduct()">
+                        <ion-icon class="ion-icon-delete" slot="icon-only" :icon="trash">
+                        </ion-icon>
+                    </ion-button>
+
+                </div>
             </div>
         </ion-card>
     </base-layout>
@@ -39,6 +43,7 @@ import {
     IonIcon
 } from '@ionic/vue';
 import { mapGetters } from 'vuex';
+import router from '@/router';
 
 
 export default defineComponent({
@@ -62,16 +67,35 @@ export default defineComponent({
         return {
             listingId: this.$route.params.id,
             product: {} as any,
-            userId: store.getters
+            userId: store.getters,
+            iconLoad: false
         }
     },
     mounted() {
         store.dispatch('getProductById', this.listingId)
-            .then(data => this.product = data.data[0])
+            .then(data => {
+                this.product = data.data[0]
+                this.iconLoad = true;
+            })
             .catch(err => console.log('err in by id:', err))
     },
     computed: {
         ...mapGetters(['getUserId'])
+    },
+    methods: {
+        async deleteProduct() {
+            try {
+                console.log('button clicked');
+                const response = await store.dispatch('deleteProduct', this.listingId);
+                console.log('delete:', response);
+                router.replace('/home');
+            } catch (err) {
+                console.log(err);
+            }
+        },
+        editProduct() {
+            router.replace(`/products/edit/${this.listingId}`)
+        }
     }
 })
 </script>
@@ -92,6 +116,16 @@ export default defineComponent({
     margin-top: 17px;
     margin-bottom: 17px;
 }
+
+/* 
+.ion-button-css-delete {
+    flex: auto;
+    margin-left: 27px;
+    margin-right: 27px;
+    margin-top: 17px;
+    margin-bottom: 17px;
+    color: rgb(232, 61, 61);
+} */
 
 .button-css {
     display: flex;

@@ -1,14 +1,24 @@
 <template>
   <base-layout>
-    <ion-card v-for="product in products" :key="product.id" :router-link="`/products/${product.id}`">
-      <img :src="product.product_image" alt="{{product.name}}" />
-      <ion-card-header>
-        <ion-card-title>{{ product.name }}</ion-card-title>
-        <ion-card-subtitle>{{ product.category }}</ion-card-subtitle>
-      </ion-card-header>
-      <!-- {{ product.product_image }} -->
-      <ion-card-content>{{ product.description }}</ion-card-content>
-    </ion-card>
+    <div v-if="isLoading">
+      <img class="loading-icon" src="@/files/icons8-spinner.gif " alt="">
+    </div>
+    <div v-if="!isLoading">
+      <ion-card v-for="product in products" :key="product.id" :router-link="`/products/${product.id}`">
+        <img :src="product.product_image" alt="{{product.name}}" />
+        <ion-card-header>
+          <ion-card-title>{{ product.name }}</ion-card-title>
+          <ion-card-subtitle>{{ product.category }}</ion-card-subtitle>
+        </ion-card-header>
+        <!-- {{ product.product_image }} -->
+        <ion-card-content>
+          <div class="description-css">
+            {{ product.description }}
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
   </base-layout>
 </template>
 
@@ -23,6 +33,7 @@ import {
   IonCardSubtitle,
   IonCardContent
 } from '@ionic/vue';
+import { mapState } from 'vuex';
 
 export default defineComponent({
   name: 'HomePage',
@@ -36,15 +47,38 @@ export default defineComponent({
   data() {
     return {
       products: [{}] as any,
+      isLoading: true
     }
+
   },
-  mounted() {
+  beforeCreate() {
     store.dispatch('getProducts')
       .then(data => {
+        console.log('beforecreated:', data)
         this.products = data.data
-        console.log('data:', data);
       })
       .catch(err => console.log(err))
+  },
+  // async serverPrefetch() {
+  //   try {
+
+  //     this.products = await store.dispatch('getProducts')
+  //   } catch (err) {
+  //     console.log('err');
+  //   }
+
+  // },
+  // created() {
+  //   store.dispatch('getProducts')
+  //     .then(data => {
+  //       this.products = data.data
+  //       console.log('data:', data);
+  //       this.isLoading = false;
+  //     })
+  //     .catch(err => console.log(err))
+  // },
+  mounted() {
+    this.getProducts()
   },
   methods: {
     async getAllProduct() {
@@ -54,6 +88,26 @@ export default defineComponent({
         return response;
       } catch (err) {
         console.log(err);
+      }
+    },
+    getProducts() {
+      store.dispatch('getProducts')
+        .then(data => {
+          this.products = data.data
+          console.log('data:', data);
+          this.isLoading = false;
+        })
+        .catch(err => console.log(err))
+    }
+  },
+  computed: mapState(['refresh']),
+  watch: {
+    refresh(newValue, oldValue) {
+      console.log(`ne value:${newValue}  & oldValue::${oldValue}`)
+
+      if (newValue == true) {
+        this.getProducts()
+        store.commit('SET_REFRESH_PAGE', false)
       }
     }
   }
@@ -87,5 +141,14 @@ export default defineComponent({
 
 #container a {
   text-decoration: none;
+}
+
+.loading-icon {
+  align-items: center;
+}
+
+.description-css {
+  overflow: hidden;
+  max-height: 80px;
 }
 </style>

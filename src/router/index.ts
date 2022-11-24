@@ -13,8 +13,11 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/home',
-    name: 'Home',
-    component: HomePage
+    name: 'HomePage',
+    component: HomePage,
+    meta: {
+      reload: true
+    }
   }, {
     path: '/login',
     name: 'Login',
@@ -31,6 +34,10 @@ const routes: Array<RouteRecordRaw> = [
     path: '/products',
     name: 'GetProducts',
     component: () => import('@/views/product/ProductsListingPage.vue')
+  }, {
+    path: '/products/edit/:id',
+    name: 'EditProduct',
+    component: () => import('@/views/product/EditProductPage.vue')
   }, {
     path: '/products/:id',
     name: 'GetSingleProduct',

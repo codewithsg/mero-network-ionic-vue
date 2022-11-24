@@ -19,8 +19,7 @@
                     <!-- <ion-title>Login</ion-title> -->
                 </div>
             </ion-toolbar>
-        </ion-header>
-        <ion-content>
+
             <div class="dropdown-menu" v-if="isExpanded">
                 <ion-list class="dropdown-menu-nav">
                     <ion-item class="dropdown-menu-item">
@@ -28,23 +27,25 @@
                             <div class="dropdown-menu-text">Home</div>
                         </a>
                     </ion-item>
-                    <ion-item class="dropdown-menu-item">
+                    <ion-item class="dropdown-menu-item" v-if="loginStatus">
                         <a class="dropdown-menu-link" href="/products/add">
                             <div class="dropdown-menu-text">Add Product</div>
                         </a>
                     </ion-item>
-                    <ion-item class="dropdown-menu-item" v-if="!getLoginStatus">
+                    <ion-item class="dropdown-menu-item" v-if="!loginStatus">
                         <a class="dropdown-menu-link" href="/login">
                             <div class="dropdown-menu-text">Login</div>
                         </a>
                     </ion-item>
-                    <ion-item class="dropdown-menu-item" v-if="getLoginStatus" @click="logOut">
+                    <ion-item class="dropdown-menu-item" v-if="loginStatus" @click="logOut">
                         <a class="dropdown-menu-link">
                             <div class="dropdown-menu-text">Logout</div>
                         </a>
                     </ion-item>
                 </ion-list>
             </div>
+        </ion-header>
+        <ion-content>
             <slot />
         </ion-content>
     </ion-page>
@@ -68,7 +69,7 @@ import { menu, arrowBack } from 'ionicons/icons';
 // import { mapGetters } from 'vuex';
 import store from './../../store/index';
 import { Component } from 'ionicons/dist/types/stencil-public-runtime';
-import { mapGetters } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 
 
 
@@ -95,9 +96,11 @@ export default defineComponent({
     data() {
         return {
             isExpanded: false,
-            loginStatus: false,
+            loginStatus: sessionStorage.getItem('login_status')
         }
     },
+    // mounted() {
+    // },
     // actions
     methods: {
         toogleMenu() {
@@ -105,15 +108,20 @@ export default defineComponent({
         },
         async logOut() {
             try {
+                // this.$router.push('/home');
                 await store.dispatch("logout");
-                this.$router.push('/home');
+                this.isExpanded = false
             } catch (err: any) {
                 console.log(err);
             }
         }
     },
-    computed: {
-        ...mapGetters(['getLoginStatus'])
+    computed: mapState(['login_status']),
+    watch: {
+        login_status(newValue, oldValue) {
+            console.log(`ne value:${newValue}  & oldValue::${oldValue}`)
+            this.loginStatus = newValue
+        }
     }
 })
 </script>

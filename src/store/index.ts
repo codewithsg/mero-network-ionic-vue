@@ -9,7 +9,8 @@ export default createStore({
     access_token: sessionStorage.getItem("access_token"),
     login_status: sessionStorage.getItem('login_status'),
     user_name: sessionStorage.getItem("user_name"),
-    user_id: sessionStorage.getItem("user_id")
+    user_id: sessionStorage.getItem("user_id"),
+    refresh: false
   },
   getters: {
     getLoginStatus(state) {
@@ -24,11 +25,13 @@ export default createStore({
       state.access_token = data;
       sessionStorage.setItem("access_token", data);
       sessionStorage.setItem("login_status", 'true');
+      state.login_status = 'true'
     },
     SET_USER_NAME(state, data) {
       state.user_name = data;
       sessionStorage.setItem('user_name', data);
       sessionStorage.setItem("login_status", 'true');
+      state.login_status = 'true'
 
     },
     SET_USER_ID(state, data) {
@@ -44,6 +47,9 @@ export default createStore({
       state.user_name = null;
       sessionStorage.removeItem('user_id');
       state.user_id = null;
+    },
+    SET_REFRESH_PAGE: (state, data) => {
+      state.refresh = data;
     }
   },
   actions: {

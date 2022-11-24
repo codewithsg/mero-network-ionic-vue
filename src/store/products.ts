@@ -35,10 +35,27 @@ export default {
         getProductById: async (context: any, id: number) => {
             try {
                 const res = await instance.get(`products/${id}`);
+                return res;
+            } catch (err) {
+                return (err);
+            }
+        },
+        deleteProduct: async (context: any, id: number) => {
+            try {
+                console.log('id:', id);
+                const res = await instance.delete(`products/${id}`);
                 console.log('res in by id:', res);
                 return res;
             } catch (err) {
                 return (err);
+            }
+        },
+        editProduct: async (context: any, data: any) => {
+            try {
+                const res = await instance.put(`products/${data.id}`, data);
+                return res;
+            } catch (err) {
+                return err;
             }
         }
 
